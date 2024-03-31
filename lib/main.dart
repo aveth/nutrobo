@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/di.dart';
-import 'package:provider/provider.dart';
+import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 
-import 'chat_controller.dart';
-import 'chat_screen.dart';
+import 'features/chat/ui/chat_screen.dart';
 
 void main() {
   setupDependencyInjection();
@@ -17,15 +17,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat UI Guide',
+      title: 'Nutrobo: Your AI Nutrition Assistant',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ChangeNotifierProvider(
-        create: (_) => ChatController(),
-        child: const ChatScreen(),
-      ),
+      home: MultiBlocProvider(providers: [
+        BlocProvider(
+          create: (BuildContext context) => ChatBloc(),
+        ),
+      ], child: ChatScreen()),
     );
   }
 }

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:nutrobo/chat_bubble.dart';
-import 'package:nutrobo/chat_message.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
+import 'package:nutrobo/features/chat/ui/chat_bubble.dart';
 
 import 'chat_controller.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+
+  ChatScreen({super.key});
+
+  late final ChatController _controller = ChatController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text("Chat"),
+        title: const Text("Nutrobo: Your AI Nutrition Assistant"),
         backgroundColor: const Color(0xFF007AFF),
       ),
       body: Column(
@@ -21,15 +24,14 @@ class ChatScreen extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                context.read<ChatController>().focusNode.unfocus();
+                _controller.focusNode.unfocus();
                 // FocusScope.of(context).unfocus();
               },
               child: Align(
                 alignment: Alignment.topCenter,
-                child: Selector<ChatController, List<ChatMessage>>(
-                  selector: (context, controller) =>
-                      controller.chatList.reversed.toList(),
-                  builder: (context, chatList, child) {
+                child: BlocBuilder<ChatBloc, ChatState>(
+                  bloc: context.read<ChatBloc>(),
+                  builder: (context, chatState) {
                     return ListView.separated(
                       shrinkWrap: true,
                       reverse: true,
@@ -38,11 +40,10 @@ class ChatScreen extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(
                         height: 12,
                       ),
-                      controller:
-                      context.read<ChatController>().scrollController,
-                      itemCount: chatList.length,
+                      controller: _controller.scrollController,
+                      itemCount: chatState.messages.length,
                       itemBuilder: (context, index) {
-                        return ChatBubble(message: chatList[index]);
+                        return ChatBubble(message: chatState.messages[index]);
                       },
                     );
                   },
@@ -50,7 +51,7 @@ class ChatScreen extends StatelessWidget {
               ),
             ),
           ),
-          const _BottomInputField(),
+          _BottomInputField(controller: _controller),
         ],
       ),
     );
@@ -59,7 +60,12 @@ class ChatScreen extends StatelessWidget {
 
 /// Bottom Fixed Filed
 class _BottomInputField extends StatelessWidget {
-  const _BottomInputField({super.key});
+
+  final ChatController controller;
+
+  const _BottomInputField({
+    required this.controller, super.key
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +84,9 @@ class _BottomInputField extends StatelessWidget {
         child: Stack(
           children: [
             TextField(
-              focusNode: context.read<ChatController>().focusNode,
-              onChanged: context.read<ChatController>().onFieldChanged,
-              controller: context.read<ChatController>().textEditingController,
+              focusNode: controller.focusNode,
+              onChanged: controller.onFieldChanged,
+              controller: controller.textEditingController,
               maxLines: null,
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
@@ -107,7 +113,10 @@ class _BottomInputField extends StatelessWidget {
               right: 0,
               child: IconButton(
                 icon: const Icon(Icons.send),
-                onPressed: context.read<ChatController>().onFieldSubmitted,
+                onPressed: () {
+                  var text = controller.onFieldSubmitted();
+                  context.read<ChatBloc>().sendMessage(text);
+                },
               ),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
-import 'package:nutrobo/chat_message.dart';
+
+import 'chat_message.dart';
 
 class ChatBubble extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
