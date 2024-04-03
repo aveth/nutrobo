@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nutrobo/di.dart';
+import 'package:nutrobo/core/di.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 
 import 'features/chat/ui/chat_screen.dart';
 
-void main() {
-  setupDependencyInjection();
-  runApp(const MyApp());
+void main() async {
+  await setupDependencyInjection();
+  runApp(const NutroboApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class NutroboApp extends StatelessWidget {
+  const NutroboApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       ),
       home: MultiBlocProvider(providers: [
         BlocProvider(
-          create: (BuildContext context) => ChatBloc(),
+          create: (BuildContext context) => getIt.get<ChatBloc>(),
         ),
       ], child: ChatScreen()),
     );

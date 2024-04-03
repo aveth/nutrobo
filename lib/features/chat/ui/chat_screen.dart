@@ -32,20 +32,29 @@ class ChatScreen extends StatelessWidget {
                 child: BlocBuilder<ChatBloc, ChatState>(
                   bloc: context.read<ChatBloc>(),
                   builder: (context, chatState) {
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      reverse: true,
-                      padding: const EdgeInsets.only(top: 12, bottom: 20) +
-                          const EdgeInsets.symmetric(horizontal: 12),
-                      separatorBuilder: (_, __) => const SizedBox(
-                        height: 12,
-                      ),
-                      controller: _controller.scrollController,
-                      itemCount: chatState.messages.length,
-                      itemBuilder: (context, index) {
-                        return ChatBubble(message: chatState.messages[index]);
-                      },
-                    );
+                    switch (chatState.runtimeType) {
+                      case InitialState _:
+                        return const CircularProgressIndicator();
+                      case SuccessState _:
+                        chatState as SuccessState;
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          reverse: true,
+                          padding: const EdgeInsets.only(top: 12, bottom: 20) +
+                              const EdgeInsets.symmetric(horizontal: 12),
+                          separatorBuilder: (_, __) => const SizedBox(
+                            height: 12,
+                          ),
+                          controller: _controller.scrollController,
+                          itemCount: chatState.messages.length,
+                          itemBuilder: (context, index) {
+                            return ChatBubble(message: chatState.messages[index]);
+                          },
+                        );
+                      default:
+                        return Container();
+                    }
+
                   },
                 ),
               ),

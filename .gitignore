@@ -44,3 +44,7 @@ app.*.map.json
 
 # The apps env file
 .env
+
+# Generated files
+*.g.dart
+*.chopper.dart
