@@ -31,7 +31,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final FlutterSecureStorage storage;
   final NutroboApi api;
 
-  List<Message> _currentMessages = [];
+  List<ChatMessage> _currentMessages = [];
 
   ChatBloc({
     required this.storage,
@@ -57,6 +57,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
 
     on<SendEvent>((event, emit) async {
+      var messages = _currentMessages;
+      messages.insert(0, ChatMessage(
+          message: event.message,
+          time: DateTime.now(),
+          type: ChatMessageType.sent
+      ));
+
+      messages.insert(0, ChatMessage(
+          message: '...',
+          time: DateTime.now(),
+          type: ChatMessageType.received
+      ));
+
+      emit(_stateFromMessages(messages));
+
       var threadId = await storage.getThreadId() ?? "";
       final response = await api.sendMessage(SendMessage(
           threadId: threadId,
@@ -81,13 +96,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (response != null && response.isSuccessful) {
       var messages = response.body?.messages;
       if (messages != null) {
-        _currentMessages = messages;
+        _currentMessages = messages.map((m) =>
+            ChatMessage.fromMessage(m)
+        ).toList();
       }
     }
 
-    return SuccessState(messages: _currentMessages.map((m) =>
+    return _stateFromMessages(_currentMessages);
+  }
+
+  ChatState _stateFromMessages(List<ChatMessage> messages) =>
+      SuccessState(messages: messages.map((m) =>
         ChatMessage.fromMessage(m)
     ).toList());
-  }
 
 }
