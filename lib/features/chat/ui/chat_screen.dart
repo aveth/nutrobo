@@ -30,12 +30,12 @@ class ChatScreen extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: BlocBuilder<ChatBloc, ChatState>(
-                  bloc: context.read<ChatBloc>(),
+                  bloc: context.watch<ChatBloc>(),
                   builder: (context, chatState) {
                     switch (chatState.runtimeType) {
-                      case InitialState _:
+                      case InitialState:
                         return const CircularProgressIndicator();
-                      case SuccessState _:
+                      case SuccessState:
                         chatState as SuccessState;
                         return ListView.separated(
                           shrinkWrap: true,

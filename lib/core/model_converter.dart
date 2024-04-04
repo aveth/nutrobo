@@ -4,14 +4,14 @@ import 'package:chopper/chopper.dart';
 
 class ModelConverter extends JsonConverter {
 
-  final Map<Type, Function> typeToJsonFactoryMap;
+  final Map<Type, Function> fromJsonFunctions;
 
-  const ModelConverter(this.typeToJsonFactoryMap);
+  const ModelConverter(this.fromJsonFunctions);
 
   @override
   Response<BodyType> convertResponse<BodyType, InnerType>(Response response) {
     return response.copyWith(
-      body: fromJsonData<BodyType, InnerType>(response.body, typeToJsonFactoryMap[InnerType]!),
+      body: fromJsonData<BodyType, InnerType>(response.body, fromJsonFunctions[InnerType]!),
     );
   }
 

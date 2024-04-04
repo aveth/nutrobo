@@ -3,6 +3,7 @@ import 'package:chopper/chopper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:nutrobo/extensions/flutter_secure_storage.dart';
 import 'package:nutrobo/features/chat/model/chat_message.dart';
+import 'package:nutrobo/features/chat/model/message.dart';
 import 'package:nutrobo/features/chat/model/send_message.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
@@ -25,15 +26,12 @@ class SuccessState extends ChatState {
   SuccessState({required this.messages});
 }
 
-class ErrorState extends ChatState {
-  final String message;
-  ErrorState({required this.message});
-}
-
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   final FlutterSecureStorage storage;
   final NutroboApi api;
+
+  List<Message> _currentMessages = [];
 
   ChatBloc({
     required this.storage,
@@ -47,9 +45,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         response = await api.createThread();
         var id = response.body?.id;
         if (id == null) {
-          emit(ErrorState(
-              message: 'Unable to connect to Nutrobo.'
-          ));
+          emit(_stateFromResponse(null));
         } else {
           storage.setThreadId(id);
         }
@@ -64,7 +60,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       var threadId = await storage.getThreadId() ?? "";
       final response = await api.sendMessage(SendMessage(
           threadId: threadId,
-          content: event.message
+          content: event.message,
+          data: [
+            "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
+            'The user should be address as Avais'
+          ]
       ));
 
       emit(_stateFromResponse(response));
@@ -77,17 +77,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     add(SendEvent(message: message));
   }
 
-  ChatState _stateFromResponse(Response<Thread> response) {
-    var thread = response.body;
-    if (!response.isSuccessful || thread == null) {
-      return ErrorState(
-          message: 'HTTP error: ${response.statusCode}'
-      );
-    } else {
-      return SuccessState(messages: thread.messages.map((e) =>
-          ChatMessage.fromMessage(e)
-      ).toList());
+  ChatState _stateFromResponse(Response<Thread>? response) {
+    if (response != null && response.isSuccessful) {
+      var messages = response.body?.messages;
+      if (messages != null) {
+        _currentMessages = messages;
+      }
     }
+
+    return SuccessState(messages: _currentMessages.map((m) =>
+        ChatMessage.fromMessage(m)
+    ).toList());
   }
 
 }

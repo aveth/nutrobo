@@ -6,7 +6,7 @@ part 'send_message.g.dart';
 class SendMessage {
   final String threadId;
   final String content;
-  final Map<String, String>? data;
+  final List<String>? data;
 
   SendMessage({
     required this.threadId,

@@ -6,7 +6,7 @@ import 'package:nutrobo/features/chat/model/thread.dart';
 
 part 'nutrobo_api.chopper.dart';
 
-@ChopperApi(baseUrl: '/v1')
+@ChopperApi(baseUrl: 'v1')
 abstract class NutroboApi extends ChopperService {
 
   static NutroboApi create([ChopperClient? client]) => _$NutroboApi(client);
@@ -17,7 +17,7 @@ abstract class NutroboApi extends ChopperService {
   @Post(path: 'create-thread', optionalBody: true)
   Future<Response<Thread>> createThread();
 
-  @Post(path: 'get-thread')
-  Future<Response<Thread>> getThread(@query String threadId);
+  @Get(path: 'get-thread/{threadId}')
+  Future<Response<Thread>> getThread(@path String threadId);
 
 }

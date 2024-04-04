@@ -2,6 +2,7 @@ import 'package:chopper/chopper.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:nutrobo/core/environment.dart';
 import 'package:nutrobo/core/model_converter.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
@@ -14,10 +15,17 @@ Future<void> setupDependencyInjection() async {
 
   await dotenv.load(fileName: ".env");
 
+  _logger();
   _storage();
   _environment();
   _chopper();
   _viewModels();
+}
+
+void _logger() {
+  Logger.root.onRecord.listen((rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
 }
 
 void _storage() {
@@ -40,10 +48,13 @@ void _chopper() {
     services: [
       NutroboApi.create()
     ],
+    interceptors: [
+      HttpLoggingInterceptor()
+    ],
     errorConverter: const JsonConverter(),
     converter: ModelConverter({
-      Thread : (obj) => (obj as Thread).toJson()
-    })
+      Thread: (json) => Thread.fromJson(json)
+    }),
   );
 
   getIt.registerSingleton(chopper);

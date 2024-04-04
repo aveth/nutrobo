@@ -11,11 +11,11 @@ class ChatController {
   String onFieldSubmitted() {
     if (!isTextFieldEnable) return "";
 
-    scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    // scrollController.animateTo(
+    //   0,
+    //   duration: const Duration(milliseconds: 300),
+    //   curve: Curves.easeInOut,
+    // );
 
     var text = textEditingController.text;
     textEditingController.text = '';
