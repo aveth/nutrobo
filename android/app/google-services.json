@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "11549781461",
+    "project_id": "nutrobo-app",
+    "storage_bucket": "nutrobo-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11549781461:android:f3ac11a23d5cc36df0a15c",
+        "android_client_info": {
+          "package_name": "com.aveth.nutrobo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11549781461-c3mn8lmm3lnfgbbfbn75gealogpuhamt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aveth.nutrobo",
+            "certificate_hash": "2007602fa36587557d566f710b660d4776181ea7"
+          }
+        },
+        {
+          "client_id": "11549781461-flutavhcq4s3ue71l5rv2bnlrcnu54bm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1kGrVJqBH87WnaGcVMqG2fm6NWEcO9ig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11549781461-flutavhcq4s3ue71l5rv2bnlrcnu54bm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "11549781461-bvic5dpbmb1pltlrdn2nkul114mk81j5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nutrobo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

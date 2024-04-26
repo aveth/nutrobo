@@ -4,14 +4,12 @@ part 'send_message.g.dart';
 
 @JsonSerializable()
 class SendMessage {
-  final String threadId;
   final String content;
   final List<String>? data;
 
   SendMessage({
-    required this.threadId,
     required this.content,
-    this.data
+    this.data,
   });
 
   factory SendMessage.fromJson(Map<String, dynamic> json) => _$SendMessageFromJson(json);

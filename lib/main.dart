@@ -1,11 +1,14 @@
+import 'package:alice/alice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/core/di.dart';
+import 'package:nutrobo/features/auth/bloc/auth_bloc.dart';
+import 'package:nutrobo/features/auth/ui/auth_screen.dart';
+import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 
-import 'features/chat/ui/chat_screen.dart';
-
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await setupDependencyInjection();
   runApp(const NutroboApp());
 }
@@ -17,7 +20,8 @@ class NutroboApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Nutrobo: Your AI Nutrition Assistant',
+      title: 'Diabetes Friend',
+      navigatorKey: getIt.get<Alice>().getNavigatorKey(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -26,7 +30,11 @@ class NutroboApp extends StatelessWidget {
         BlocProvider(
           create: (BuildContext context) => getIt.get<ChatBloc>(),
         ),
-      ], child: ChatScreen()),
+        BlocProvider(
+          create: (BuildContext context) => getIt.get<BarcodeBloc>(),
+        ),
+        BlocProvider(create: (context) => getIt.get<AuthBloc>())
+      ], child: const AuthScreen()),
     );
   }
 }
