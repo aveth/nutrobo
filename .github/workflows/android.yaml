@@ -10,6 +10,5 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          version: 1.0.0
       - name: Build Android App
         run: flutter --version && flutter build apk
