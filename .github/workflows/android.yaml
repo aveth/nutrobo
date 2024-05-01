@@ -12,6 +12,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml # path to pubspec.yaml
+          version: 1.0.0
       - name: Build Android App
         run: flutter --version && flutter build apk
