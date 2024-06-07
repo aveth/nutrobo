@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chopper/chopper.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:nutrobo/core/logger.dart';
 import 'package:nutrobo/features/auth/service/auth_service.dart';
 
 class AuthInterceptor implements RequestInterceptor {
@@ -20,7 +20,7 @@ class AuthInterceptor implements RequestInterceptor {
       override: false,
     );
 
-    debugPrint(
+    log(
       '[AuthInterceptor] accessToken: ${updatedRequest.headers[HttpHeaders.authorizationHeader]}',
     );
 

@@ -50,15 +50,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }) : super(InitialState()) {
 
     on<InitialEvent>((event, emit) async {
-      var threadId = "";
+      var threadId = (await api.getProfile()).body?.threads.firstOrNull;
       Response<Thread> response;
       if (threadId == null) {
         response = await api.createThread();
         var id = response.body?.id;
         if (id == null) {
           emit(_stateFromResponse(null));
-        } else {
-          //storage.setThreadId(id);
         }
       } else {
         response = await api.getThread(threadId);

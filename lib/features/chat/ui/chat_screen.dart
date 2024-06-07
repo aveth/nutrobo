@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:nutrobo/core/command.dart';
@@ -10,10 +9,12 @@ import 'package:nutrobo/features/chat/ui/chat_messages.dart';
 import 'package:nutrobo/features/chat/ui/command_bubble.dart';
 import 'package:nutrobo/features/chat/ui/input_field.dart';
 import 'package:nutrobo/features/ocr/ui/ocr_scanner.dart';
+import 'package:nutrobo/features/shared/ui/top_bar.dart';
 
 import 'chat_controller.dart';
 
 class ChatScreen extends StatelessWidget {
+
   ChatScreen({super.key});
 
   late final ChatController _controller = ChatController();
@@ -22,15 +23,11 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text("Your Diabetes Friend"),
-        backgroundColor: const Color(0xFF007AFF),
-      ),
+      appBar: buildAppBar(context, showSettings: true),
       body: Column(
         children: [
           Expanded(
-              child: GestureDetector(
-            onTap: () {
+            child: GestureDetector(onTap: () {
               _controller.focusNode.unfocus();
             },
             child: Align(

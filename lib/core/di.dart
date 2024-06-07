@@ -2,6 +2,7 @@ import 'package:alice/alice.dart';
 import 'package:chopper/chopper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -15,6 +16,9 @@ import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
+import 'package:nutrobo/features/profile/model/profile.dart';
+import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
+import 'package:nutrobo/features/shared/service/storage_service.dart';
 import 'package:nutrobo/firebase_options.dart';
 
 final getIt = GetIt.instance;
@@ -28,7 +32,7 @@ Future<void> setupDependencyInjection() async {
   _storage();
   _environment();
   _services();
-  _chopper();
+  await _chopper();
   _viewModels();
 }
 
@@ -40,7 +44,7 @@ Future<void> _firebase() async {
 
 void _logger() {
   Logger.root.onRecord.listen((rec) {
-    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    debugPrint('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
 }
 
@@ -49,17 +53,22 @@ void _storage() {
 }
 
 void _environment() {
-  var env = Environment(
-    nutroboApiKey: dotenv.env["NUTROBO_API_KEY"] ?? ""
-  );
-
-  getIt.registerSingleton(env);
+  getIt.registerSingleton(Environments(environments: [
+    Environment(
+        name: 'prod',
+        nutroboBaseUrl: dotenv.env["NUTROBO_BASE_URL_PROD"] ?? ""
+    ),
+    Environment(
+        name: 'dev',
+        nutroboBaseUrl: dotenv.env['NUTROBO_BASE_URL_DEV'] ?? ""
+    ),
+  ]));
 }
 
-void _chopper() {
+Future<void> _chopper() async {
   final chopper = ChopperClient(
     baseUrl: Uri.parse(
-        dotenv.env["NUTROBO_BASE_URL"] ?? ""
+        (await getIt.get<StorageService>().currentEnvironment).nutroboBaseUrl
     ),
     services: [
       NutroboApi.create()
@@ -71,7 +80,8 @@ void _chopper() {
     ],
     errorConverter: const JsonConverter(),
     converter: ModelConverter({
-      Thread: (json) => Thread.fromJson(json)
+      Thread: (json) => Thread.fromJson(json),
+      Profile: (json) => Profile.fromJson(json)
     }),
   );
 
@@ -83,9 +93,13 @@ void _services() {
       auth: FirebaseAuth.instance
   ));
   getIt.registerSingleton(Alice(
-    showNotification: true,
-    showInspectorOnShake: true,
-    maxCallsCount: 1000,
+      showNotification: true,
+      showInspectorOnShake: true,
+      maxCallsCount: 1000,
+  ));
+  getIt.registerSingleton(StorageService(
+      storage: getIt.get<FlutterSecureStorage>(),
+      environments: getIt.get<Environments>()
   ));
 }
 
@@ -99,6 +113,11 @@ void _viewModels() {
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
   getIt.registerSingleton(AuthBloc(
+      auth: getIt.get<AuthService>()
+  ));
+  getIt.registerSingleton(SettingsBloc(
+      storage: getIt.get<StorageService>(),
+      environments: getIt.get<Environments>(),
       auth: getIt.get<AuthService>()
   ));
 }

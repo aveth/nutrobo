@@ -20,8 +20,8 @@ class AuthService {
     return auth.currentUser != null;
   }
 
-  Future<String> getToken() async {
-    return await auth.currentUser?.getIdToken() ?? "";
+  Future<String> getToken({bool force = false}) async {
+    return await auth.currentUser?.getIdToken(force) ?? "";
   }
 
   Future<bool> signInWithGoogle() async {

@@ -27,6 +27,7 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
   }) : super(InitialState()) {
 
     on<_InitialEvent>((event, emit) async {
+      await _updateState(emit);
       auth.loggedInStream.listen((event) async {
         await _updateState(emit);
       });

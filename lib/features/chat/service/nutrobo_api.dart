@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
-import 'package:nutrobo/features/chat/model/message.dart';
 import 'package:nutrobo/features/chat/model/send_message.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
+import 'package:nutrobo/features/profile/model/profile.dart';
 
 part 'nutrobo_api.chopper.dart';
 
@@ -11,6 +11,9 @@ part 'nutrobo_api.chopper.dart';
 abstract class NutroboApi extends ChopperService {
 
   static NutroboApi create([ChopperClient? client]) => _$NutroboApi(client);
+
+  @Get(path: 'user/get-profile')
+  Future<Response<Profile>> getProfile();
 
   @Post(path: 'assistant/send-message/{threadId}')
   Future<Response<Thread>> sendMessage(@path String threadId, @body SendMessage message);
@@ -27,6 +30,4 @@ abstract class NutroboApi extends ChopperService {
   @Get(path: 'assistant/get-thread/{threadId}')
   Future<Response<Thread>> getThread(@path String threadId);
 
-  @Get(path: 'assistant/get-barcode-message/{barcode}')
-  Future<Response<Message>> getBarcodeMessage(@path String barcode);
 }
