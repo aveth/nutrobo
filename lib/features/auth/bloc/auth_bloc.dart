@@ -1,66 +1,48 @@
-import 'package:bloc/bloc.dart';
 import 'package:nutrobo/features/auth/service/auth_service.dart';
+import 'package:nutrobo/features/shared/bloc/base_bloc.dart';
+import 'package:nutrobo/features/shared/bloc/states.dart';
 
-abstract class _AuthEvent { }
-abstract class AuthState { }
-
-class _InitialEvent extends _AuthEvent { }
-class _LoginEvent extends _AuthEvent {
-  _LoginEvent();
-}
-class _LogoutEvent extends _AuthEvent { }
-
-class InitialState extends AuthState { }
-class LoggedInState extends AuthState {
-  final String authToken;
-  LoggedInState({required this.authToken});
-}
-class LoggedOutState extends AuthState { }
-
-
-class AuthBloc extends Bloc<_AuthEvent, AuthState> {
+class AuthBloc extends BaseBloc {
 
   final AuthService auth;
 
   AuthBloc({
     required this.auth
-  }) : super(InitialState()) {
+  }) : super(LoadingState()) {
 
-    on<_InitialEvent>((event, emit) async {
+    on<InitEvent>((event, emit) async {
       await _updateState(emit);
       auth.loggedInStream.listen((event) async {
         await _updateState(emit);
       });
     });
 
-    on<_LoginEvent>((event, emit) async {
+    on<UpdateEvent>((event, emit) async {
       await _updateState(emit);
     });
 
-    add(_InitialEvent());
+    add(InitEvent());
   }
 
   Future<void> performLogin() async {
-    final success = await auth.signInWithGoogle();
-
-    if (success) {
-      add(_LoginEvent());
-    }
+    await auth.signInWithGoogle();
+    add(UpdateEvent());
   }
 
-  void performLogout() {
-    add(_LogoutEvent());
+  Future<void> performLogout() async {
+    await auth.signOut();
+    add(UpdateEvent());
   }
 
   Future<void> _updateState(emit) async {
     if (!auth.isLoggedIn) {
-      emit(LoggedOutState());
+      emit(FailureState());
     } else {
       var token = await auth.getToken();
-      if (token.isEmpty) {
-        emit(LoggedOutState());
+      if (token.isNotEmpty) {
+        emit(SuccessState());
       } else {
-        emit(LoggedInState(authToken: token));
+        emit(FailureState());
       }
     }
   }

@@ -22,30 +22,30 @@ class ChatMessages extends StatelessWidget {
   }
 
   Widget _bodyFromState(ChatState state) {
-      switch (state) {
-        case InitialState _:
-          return const Center(
-              child: CircularProgressIndicator()
-          );
-        case SuccessState _:
-          return ListView.separated(
-            shrinkWrap: true,
-            reverse: true,
-            padding: const EdgeInsets.only(top: 12, bottom: 20) +
-                const EdgeInsets.symmetric(horizontal: 12),
-            separatorBuilder: (_, __) =>
-            const SizedBox(
-              height: 12,
-            ),
-            controller: _controller.scrollController,
-            itemCount: state.messages.length,
-            itemBuilder: (context, index) {
-              return ChatBubble(message: state.messages[index]);
-            },
-          );
-        default:
-          return Container(color: Colors.white);
-      }
+    switch (state) {
+      case InitialState():
+        return const Center(
+            child: CircularProgressIndicator()
+        );
+      case SuccessState():
+        return ListView.separated(
+          shrinkWrap: true,
+          reverse: true,
+          padding: const EdgeInsets.only(top: 12, bottom: 20) +
+              const EdgeInsets.symmetric(horizontal: 12),
+          separatorBuilder: (_, __) =>
+          const SizedBox(
+            height: 12,
+          ),
+          controller: _controller.scrollController,
+          itemCount: state.messages.length,
+          itemBuilder: (context, index) {
+            return ChatBubble(message: state.messages[index]);
+          },
+        );
+      default:
+        return Container(color: Colors.white);
     }
+  }
 }
 

@@ -32,7 +32,7 @@ class SuccessState extends ChatState {
 }
 
 class LoadingState extends SuccessState {
-  LoadingState({required messages}) : super(messages: messages);
+  LoadingState({required super.messages});
 }
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {

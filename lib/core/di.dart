@@ -16,6 +16,7 @@ import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
+import 'package:nutrobo/features/home/bloc/home_bloc.dart';
 import 'package:nutrobo/features/profile/model/profile.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 import 'package:nutrobo/features/shared/service/storage_service.dart';
@@ -108,16 +109,21 @@ void _viewModels() {
       auth: getIt.get<AuthService>(),
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
+
   getIt.registerSingleton(BarcodeBloc(
       storage: getIt.get<FlutterSecureStorage>(),
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
+
   getIt.registerSingleton(AuthBloc(
       auth: getIt.get<AuthService>()
   ));
+
   getIt.registerSingleton(SettingsBloc(
       storage: getIt.get<StorageService>(),
       environments: getIt.get<Environments>(),
       auth: getIt.get<AuthService>()
   ));
+
+  getIt.registerSingleton(HomeBloc());
 }

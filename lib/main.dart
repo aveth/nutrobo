@@ -6,6 +6,7 @@ import 'package:nutrobo/features/auth/bloc/auth_bloc.dart';
 import 'package:nutrobo/features/auth/ui/auth_screen.dart';
 import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
+import 'package:nutrobo/features/home/bloc/home_bloc.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 
 void main() async {
@@ -39,6 +40,9 @@ class NutroboApp extends StatelessWidget {
         ),
         BlocProvider(
             create: (context) => getIt.get<SettingsBloc>()
+        ),
+        BlocProvider(
+            create: (context) => getIt.get<HomeBloc>()
         )
       ], child: const AuthScreen()),
     );
