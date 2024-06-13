@@ -24,8 +24,9 @@ class HomeScreen extends StatelessWidget {
         }
       }),
       bottomNavigationBar: UiBuilder<HomeBloc>((context, state) {
-        switch (state) {
-          case HomeSuccessState():
+        switch (state.runtimeType) {
+          case HomeSuccessState:
+            state as HomeSuccessState;
             return BottomNavigationBar(
               currentIndex: state.currentTabIndex,
               onTap: (index) => context.read<HomeBloc>().switchTab(index),
