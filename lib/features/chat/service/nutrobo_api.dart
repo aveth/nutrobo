@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chopper/chopper.dart';
 import 'package:nutrobo/features/chat/model/send_message.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
+import 'package:nutrobo/features/meals/model/food.dart';
 import 'package:nutrobo/features/profile/model/profile.dart';
 
 part 'nutrobo_api.chopper.dart';
@@ -29,5 +30,8 @@ abstract class NutroboApi extends ChopperService {
 
   @Get(path: 'assistant/get-thread/{threadId}')
   Future<Response<Thread>> getThread(@path String threadId);
+
+  @Get(path: 'food/get-by-barcode/{barcode}')
+  Future<Response<Food>> getByBarcode(@path String barcode);
 
 }

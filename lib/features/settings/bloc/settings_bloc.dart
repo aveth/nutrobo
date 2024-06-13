@@ -1,26 +1,21 @@
-import 'package:bloc/bloc.dart';
 import 'package:nutrobo/core/environment.dart';
 import 'package:nutrobo/features/auth/service/auth_service.dart';
+import 'package:nutrobo/features/shared/bloc/base_bloc.dart';
+import 'package:nutrobo/features/shared/bloc/states.dart';
 import 'package:nutrobo/features/shared/service/storage_service.dart';
 
-abstract class _SettingsEvent { }
-abstract class SettingsState { }
-
-class _InitialEvent extends _SettingsEvent { }
-
-class InitialState extends SettingsState { }
-class LoadedState extends SettingsState {
+class SettingsSuccessState extends SuccessState {
   final List<String> environments;
   final String currentEnvironment;
   final String authToken;
-  LoadedState({
+  SettingsSuccessState({
     required this.environments,
     required this.currentEnvironment,
     required this.authToken,
   });
 }
 
-class SettingsBloc extends Bloc<_SettingsEvent, SettingsState> {
+class SettingsBloc extends BaseBloc {
 
   final StorageService storage;
   final AuthService auth;
@@ -30,22 +25,22 @@ class SettingsBloc extends Bloc<_SettingsEvent, SettingsState> {
     required this.storage,
     required this.environments,
     required this.auth,
-  }) : super(InitialState()) {
+  }) : super(LoadingState()) {
 
-    on<_InitialEvent>((event, emit) async {
-      emit(LoadedState(
+    on<UpdateEvent>((event, emit) async {
+      emit(SettingsSuccessState(
           environments: environments.environments.map((e) => e.name).toList(),
           currentEnvironment: (await storage.currentEnvironment).name,
           authToken: await auth.getToken(),
       ));
     });
 
-    add(_InitialEvent());
+    add(UpdateEvent());
   }
 
   Future<void> selectEnvironment(String name) async {
     await storage.updateEnvironment(name);
-    add(_InitialEvent());
+    add(UpdateEvent());
   }
 
 }

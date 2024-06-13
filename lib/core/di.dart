@@ -17,6 +17,7 @@ import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
 import 'package:nutrobo/features/home/bloc/home_bloc.dart';
+import 'package:nutrobo/features/meals/bloc/meals_bloc.dart';
 import 'package:nutrobo/features/profile/model/profile.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 import 'package:nutrobo/features/shared/service/storage_service.dart';
@@ -126,4 +127,6 @@ void _viewModels() {
   ));
 
   getIt.registerSingleton(HomeBloc());
+
+  getIt.registerSingleton(MealsBloc());
 }

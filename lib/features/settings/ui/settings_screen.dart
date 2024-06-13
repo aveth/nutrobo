@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 import 'package:nutrobo/features/shared/ui/loading_indicator.dart';
-import 'package:nutrobo/features/shared/ui/top_bar.dart';
+import 'package:nutrobo/features/shared/ui/ui_builder.dart';
 
 class SettingsScreen extends StatelessWidget {
 
@@ -11,27 +11,23 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(context),
-      body: BlocBuilder<SettingsBloc, SettingsState>(
-          bloc: context.watch<SettingsBloc>(),
-          builder: (context, state) {
-            switch (state) {
-              case LoadedState _:
-                return Column(
-                  children: [
-                    _environmentSelector(state, context),
-                    _authToken(state, context),
-                  ],
-                );
-              default:
-                return const LoadingIndicator();
-            }
-          })
-    );
+    return UiBuilder<SettingsBloc>((context, state) {
+      switch (state.runtimeType) {
+        case SettingsSuccessState:
+          state as SettingsSuccessState;
+          return Column(
+            children: [
+              _environmentSelector(state, context),
+              _authToken(state, context),
+            ],
+          );
+        default:
+          return const LoadingIndicator();
+      }
+    });
   }
     
-  Widget _environmentSelector(LoadedState state, BuildContext context) {
+  Widget _environmentSelector(SettingsSuccessState state, BuildContext context) {
     return DropdownButton(
       value: state.currentEnvironment,
       items: List.generate(state.environments.length, (index) {
@@ -45,7 +41,7 @@ class SettingsScreen extends StatelessWidget {
       });
   }
 
-  Widget _authToken(LoadedState state, BuildContext context) {
+  Widget _authToken(SettingsSuccessState state, BuildContext context) {
     return TextButton(
       child: const Text('Tap to copy AuthToken'),
       onPressed: () async {

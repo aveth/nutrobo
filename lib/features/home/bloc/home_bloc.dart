@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nutrobo/features/chat/ui/chat_screen.dart';
+import 'package:nutrobo/features/settings/ui/settings_screen.dart';
 import 'package:nutrobo/features/shared/bloc/base_bloc.dart';
 import 'package:nutrobo/features/shared/bloc/states.dart';
-import 'package:nutrobo/features/shared/ui/loading_indicator.dart';
 
 class HomeSuccessState extends SuccessState {
 
@@ -23,12 +23,12 @@ class HomeBloc extends BaseBloc {
 
   final _screens = [
     ChatScreen(),
-    const LoadingIndicator(),
+    const SettingsScreen(),
   ];
 
   final _items = [
     const BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chat"),
-    const BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: "Meals")
+    const BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
   ];
 
   HomeBloc() : super(LoadingState()) {
