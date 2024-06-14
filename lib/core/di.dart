@@ -128,5 +128,7 @@ void _viewModels() {
 
   getIt.registerSingleton(HomeBloc());
 
-  getIt.registerSingleton(MealsBloc());
+  getIt.registerSingleton(MealsBloc(
+      api: getIt.get<ChopperClient>().getService<NutroboApi>()
+  ));
 }

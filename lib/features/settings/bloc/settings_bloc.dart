@@ -15,6 +15,8 @@ class SettingsSuccessState extends SuccessState {
   });
 }
 
+class SettingsSignOutState extends SuccessState { }
+
 class SettingsBloc extends BaseBloc {
 
   final StorageService storage;
@@ -38,9 +40,13 @@ class SettingsBloc extends BaseBloc {
     add(UpdateEvent());
   }
 
-  Future<void> selectEnvironment(String name) async {
+  void selectEnvironment(String name) async {
     await storage.updateEnvironment(name);
     add(UpdateEvent());
+  }
+
+  void signOut() async {
+    await auth.signOut();
   }
 
 }

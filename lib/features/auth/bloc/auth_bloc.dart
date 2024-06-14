@@ -24,13 +24,8 @@ class AuthBloc extends BaseBloc {
     add(InitEvent());
   }
 
-  Future<void> performLogin() async {
+  void performLogin() async {
     await auth.signInWithGoogle();
-    add(UpdateEvent());
-  }
-
-  Future<void> performLogout() async {
-    await auth.signOut();
     add(UpdateEvent());
   }
 

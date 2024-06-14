@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:nutrobo/core/command.dart';
+import 'package:nutrobo/core/routes.dart';
 import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
-import 'package:nutrobo/features/barcode/ui/barcode_scanner.dart';
 import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'package:nutrobo/features/chat/ui/chat_messages.dart';
 import 'package:nutrobo/features/chat/ui/command_bubble.dart';
 import 'package:nutrobo/features/chat/ui/input_field.dart';
-import 'package:nutrobo/features/ocr/ui/ocr_scanner.dart';
 
 import 'chat_controller.dart';
 
@@ -66,8 +65,7 @@ CommandBubble _barcodeBubble(BuildContext context, BarcodeBloc bloc) =>
     CommandBubble(
         command: Command.barcodeScanner(context),
         onPressed: () async {
-          var result = await Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(builder: (context) => const BarcodeScanner()));
+          var result = await Routes.toBarcodeScanner(context);
           if (result != null && result is BarcodeCapture) {
             bloc.barcodeFound(result);
           }
@@ -77,8 +75,7 @@ CommandBubble _ocrBubble(BuildContext context, BarcodeBloc bloc) =>
     CommandBubble(
         command: Command.ocrScanner(context),
         onPressed: () async {
-          var result = await Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(builder: (context) => const OcrScanner()));
+          var result = await Routes.toOcrScanner(context);
           if (result != null && result is String) {
             bloc.nutritionInfoFound(result);
           }

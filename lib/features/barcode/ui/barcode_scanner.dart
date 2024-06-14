@@ -1,7 +1,5 @@
-
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:nutrobo/features/barcode/ui/scanned_barcode_label.dart';
@@ -15,15 +13,14 @@ class BarcodeScanner extends StatefulWidget {
   State<BarcodeScanner> createState() => _BarcodeScannerState();
 }
 
-class _BarcodeScannerState extends State<BarcodeScanner> with WidgetsBindingObserver {
+class _BarcodeScannerState extends State<BarcodeScanner>
+    with WidgetsBindingObserver {
   final MobileScannerController controller = MobileScannerController(
-    torchEnabled: true,
+    torchEnabled: false,
   );
 
   StreamSubscription<BarcodeCapture>? _subscription;
   Function(BarcodeCapture)? _handleBarcode;
-
-  double _zoomFactor = 0.0;
 
   @override
   void initState() {
@@ -32,7 +29,7 @@ class _BarcodeScannerState extends State<BarcodeScanner> with WidgetsBindingObse
 
     // Start listening to the barcode events.
     _handleBarcode = (BarcodeCapture capture) {
-        Navigator.of(context).maybePop(capture);
+      Navigator.of(context).maybePop(capture);
     };
 
     _subscribe();
@@ -54,99 +51,45 @@ class _BarcodeScannerState extends State<BarcodeScanner> with WidgetsBindingObse
     }
   }
 
-  Widget _buildZoomScaleSlider() {
-    return ValueListenableBuilder(
-      valueListenable: ValueNotifier(controller),
-      builder: (context, state, child) {
-        if (!state.isStarting) {
-          return const SizedBox.shrink();
-        }
-
-        final TextStyle labelStyle = Theme.of(context)
-            .textTheme
-            .headlineMedium!
-            .copyWith(color: Colors.white);
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            children: [
-              Text(
-                '0%',
-                overflow: TextOverflow.fade,
-                style: labelStyle,
-              ),
-              Expanded(
-                child: Slider(
-                  value: _zoomFactor,
-                  onChanged: (value) {
-                    setState(() {
-                      _zoomFactor = value;
-                      controller.setZoomScale(value);
-                    });
-                  },
-                ),
-              ),
-              Text(
-                '100%',
-                overflow: TextOverflow.fade,
-                style: labelStyle,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Barcode Scanner')),
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: controller,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, child) {
-              return ScannerErrorWidget(error: error);
-            },
-            onDetect: (BarcodeCapture barcodes) {
-
-            },
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              height: 100,
-              color: Colors.black.withOpacity(0.4),
-              child: Column(
-                children: [
-                  if (!kIsWeb) _buildZoomScaleSlider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ToggleFlashlightButton(controller: controller),
-                      StartStopMobileScannerButton(controller: controller),
-                      Expanded(
-                        child: Center(
-                          child: ScannedBarcodeLabel(
-                            barcodes: controller.barcodes,
-                          ),
-                        ),
-                      ),
-                      SwitchCameraButton(controller: controller),
-                      AnalyzeImageFromGalleryButton(controller: controller),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+      body: Column(
+        children: [_cameraSettingsContainer(), _cameraContainer()],
       ),
+    );
+  }
+
+  Widget _cameraContainer() {
+    return SizedBox(
+      height: 200,
+      child: MobileScanner(
+        controller: controller,
+        fit: BoxFit.fitWidth,
+        errorBuilder: (context, error, child) {
+          return ScannerErrorWidget(error: error);
+        },
+        onDetect: (BarcodeCapture barcodes) {
+          print(barcodes.toString());
+          // Not needed since we listen to the barcode stream
+        },
+      ),
+    );
+  }
+
+  Widget _cameraSettingsContainer() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ToggleFlashlightButton(controller: controller),
+        ScannedBarcodeLabel(
+          barcodes: controller.barcodes,
+          title: 'Scan',
+        ),
+        AnalyzeImageFromGalleryButton(controller: controller),
+      ],
     );
   }
 

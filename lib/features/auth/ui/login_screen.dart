@@ -10,13 +10,17 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          title: const Text("Your Diabetes Friend"),
-          backgroundColor: const Color(0xFF007AFF),
-        ),
         body: Center(
-          child: Row(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Text(
+                "Sign in to speak with your Diabetes Friend!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                ),
+              ),
               IconButton(
                   icon: const Icon(Icons.login),
                   onPressed: () => context.read<AuthBloc>().performLogin())

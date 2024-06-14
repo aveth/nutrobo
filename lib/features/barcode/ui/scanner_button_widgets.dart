@@ -82,47 +82,6 @@ class StartStopMobileScannerButton extends StatelessWidget {
   }
 }
 
-class SwitchCameraButton extends StatelessWidget {
-  const SwitchCameraButton({required this.controller, super.key});
-
-  final MobileScannerController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<MobileScannerController>(
-      valueListenable: ValueNotifier(controller),
-      builder: (context, state, child) {
-        if (!state.isStarting) {
-          return const SizedBox.shrink();
-        }
-
-        // final int? availableCameras = state.availableCameras;
-        //
-        // if (availableCameras != null && availableCameras < 2) {
-        //   return const SizedBox.shrink();
-        // }
-
-        final Widget icon;
-
-        switch (state.cameraFacingState.value) {
-          case CameraFacing.front:
-            icon = const Icon(Icons.camera_front);
-          case CameraFacing.back:
-            icon = const Icon(Icons.camera_rear);
-        }
-
-        return IconButton(
-          iconSize: 32.0,
-          icon: icon,
-          onPressed: () async {
-            await controller.switchCamera();
-          },
-        );
-      },
-    );
-  }
-}
-
 class ToggleFlashlightButton extends StatelessWidget {
   const ToggleFlashlightButton({required this.controller, super.key});
 

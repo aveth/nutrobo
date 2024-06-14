@@ -21,12 +21,19 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _environmentSelector(state, context),
                 _authToken(state, context),
+                _signOut(context),
               ],
             ),
           );
         default:
           return const LoadingIndicator();
       }
+    });
+  }
+
+  Widget _signOut(BuildContext context) {
+    return TextButton(child: const Text("Sign Out"), onPressed: () {
+      context.read<SettingsBloc>().signOut();
     });
   }
     

@@ -5,9 +5,11 @@ class ScannedBarcodeLabel extends StatelessWidget {
   const ScannedBarcodeLabel({
     super.key,
     required this.barcodes,
+    required this.title
   });
 
   final Stream<BarcodeCapture> barcodes;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +19,10 @@ class ScannedBarcodeLabel extends StatelessWidget {
         final scannedBarcodes = snapshot.data?.barcodes ?? [];
 
         if (scannedBarcodes.isEmpty) {
-          return const Text(
-            'Scan something!',
+          return Text(
+            title,
             overflow: TextOverflow.fade,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           );
         }
 
