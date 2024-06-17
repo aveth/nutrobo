@@ -15,14 +15,13 @@ class BarcodeSuccessState extends SuccessState {
   final String fiber;
   final String source;
 
-  BarcodeSuccessState({
-    required this.code,
-    required this.name,
-    required this.carbs,
-    required this.protein,
-    required this.fiber,
-    required this.source
-  });
+  BarcodeSuccessState(
+      {required this.code,
+      required this.name,
+      required this.carbs,
+      required this.protein,
+      required this.fiber,
+      required this.source});
 }
 
 class _BarcodeFoundEvent extends UpdateEvent {
@@ -43,13 +42,15 @@ class BarcodeBloc extends BaseBloc {
     });
 
     on<_BarcodeFoundEvent>((event, emit) {
-      emit(BarcodeSuccessState(
-          code: event.food.barcode,
-          name: '${event.food.brandName} ${event.food.foodName}',
-          carbs: _nutrientText(event.food.nutrients.carbohydrate),
-          protein: _nutrientText(event.food.nutrients.protein),
-          fiber: _nutrientText(event.food.nutrients.fiber),
-          source: event.food.source));
+      emit(
+        BarcodeSuccessState(
+            code: event.food.barcode,
+            name: '${event.food.brandName} ${event.food.foodName}',
+            carbs: _nutrientText(event.food.nutrients.carbohydrate),
+            protein: _nutrientText(event.food.nutrients.protein),
+            fiber: _nutrientText(event.food.nutrients.fiber),
+            source: event.food.source),
+      );
     });
 
     on<ErrorEvent>((event, emit) {
@@ -69,7 +70,8 @@ class BarcodeBloc extends BaseBloc {
   void _start() {
     controller.stop();
 
-    _subscription ??= controller.barcodes.listen((BarcodeCapture capture) async {
+    _subscription ??=
+        controller.barcodes.listen((BarcodeCapture capture) async {
       //final barcode = '0380003560011';
       final barcode = capture.barcodes.firstOrNull?.displayValue;
       if (barcode != null) {
