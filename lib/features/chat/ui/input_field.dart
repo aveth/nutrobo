@@ -5,13 +5,9 @@ import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'chat_controller.dart';
 
 class InputField extends StatelessWidget {
-
   final ChatController controller;
 
-  const InputField({
-    required this.controller,
-    super.key
-  });
+  const InputField({required this.controller, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +57,9 @@ class InputField extends StatelessWidget {
                   icon: const Icon(Icons.send),
                   onPressed: context.read<ChatBloc>().state is LoadingState
                       ? null
-                      : () => context.read<ChatBloc>().sendMessage(
-                      controller.onFieldSubmitted()
-                  )
-              ),
+                      : () => context
+                          .read<ChatBloc>()
+                          .sendMessage(controller.onFieldSubmitted())),
             ),
           ],
         ),

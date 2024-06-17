@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/features/home/bloc/home_bloc.dart';
 import 'package:nutrobo/features/shared/ui/loading_indicator.dart';
-import 'package:nutrobo/features/shared/ui/top_bar.dart';
+import 'package:nutrobo/features/shared/ui/utils.dart';
 import 'package:nutrobo/features/shared/ui/ui_builder.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: buildAppBar(context, showSettings: true),
+      appBar: buildAppBar(context),
       body: UiBuilder<HomeBloc>((context, state) {
         switch (state.runtimeType) {
           case HomeSuccessState:

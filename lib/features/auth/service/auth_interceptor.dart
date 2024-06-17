@@ -5,25 +5,25 @@ import 'package:chopper/chopper.dart';
 import 'package:nutrobo/core/logger.dart';
 import 'package:nutrobo/features/auth/service/auth_service.dart';
 
-class AuthInterceptor implements RequestInterceptor {
+class AuthInterceptor implements Interceptor {
   final AuthService auth;
 
   const AuthInterceptor({required this.auth});
 
   @override
-  FutureOr<Request> onRequest(Request request) async {
-    final updatedRequest = applyHeader(
-      request,
-      HttpHeaders.authorizationHeader,
-      'Bearer ${await auth.getToken()}',
-      // Do not override existing header
-      override: false,
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    final request = applyHeader(
+        chain.request,
+        HttpHeaders.authorizationHeader,
+        'Bearer ${await auth.getToken()}',
+    // Do not override existing header
+    override: false,
     );
 
     log(
-      '[AuthInterceptor] accessToken: ${updatedRequest.headers[HttpHeaders.authorizationHeader]}',
+    '[AuthInterceptor] accessToken: ${chain.request.headers[HttpHeaders.authorizationHeader]}',
     );
 
-    return updatedRequest;
+    return chain.proceed(request);
   }
 }

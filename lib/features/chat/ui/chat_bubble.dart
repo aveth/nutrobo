@@ -59,18 +59,18 @@ class ChatBubble extends StatelessWidget {
   Color get textColorOnType {
     switch (message.type) {
       case ChatMessageType.sent:
-        return Colors.white;
+        return Colors.black;
       case ChatMessageType.received:
-        return const Color(0xFF0F0F0F);
+        return Colors.white;
     }
   }
 
   Color get bgColorOnType {
     switch (message.type) {
       case ChatMessageType.received:
-        return const Color(0xFFE7E7ED);
+        return Colors.grey.shade800;
       case ChatMessageType.sent:
-        return const Color(0xFF007AFF);
+        return Colors.grey.shade50;
     }
   }
 

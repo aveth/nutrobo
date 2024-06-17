@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _signOut(BuildContext context) {
-    return TextButton(child: const Text("Sign Out"), onPressed: () {
+    return ElevatedButton(child: const Text("Sign Out"), onPressed: () {
       context.read<SettingsBloc>().signOut();
     });
   }
@@ -60,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
     return Row(
       children: [
         const Text("Authentication Token: "),
-        _settingsValue(TextButton(
+        _settingsValue(ElevatedButton(
           child: const Text('Tap to copy'),
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: state.authToken));

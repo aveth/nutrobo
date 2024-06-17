@@ -6,7 +6,7 @@ part 'food_unit.g.dart';
 class FoodUnit {
   final String id;
   final String name;
-  final int value;
+  final double value;
   final String unit;
 
   FoodUnit({

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:nutrobo/features/meals/model/food_unit.dart';
+import 'package:nutrobo/features/meals/model/nutrients.dart';
 
 part 'food.g.dart';
 
@@ -11,7 +12,7 @@ class Food {
   final String source;
   final String barcode;
   final FoodUnit servingSize;
-  final List<FoodUnit> nutrients;
+  final Nutrients nutrients;
 
   Food({
     required this.id,

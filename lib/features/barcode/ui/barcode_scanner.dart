@@ -1,113 +1,145 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:nutrobo/features/barcode/ui/scanned_barcode_label.dart';
-import 'package:nutrobo/features/barcode/ui/scanner_button_widgets.dart';
+import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/barcode/ui/scanner_error_widget.dart';
+import 'package:nutrobo/features/shared/bloc/states.dart';
+import 'package:nutrobo/features/shared/ui/loading_indicator.dart';
+import 'package:nutrobo/features/shared/ui/ui_builder.dart';
 
-class BarcodeScanner extends StatefulWidget {
+class BarcodeScanner extends StatelessWidget {
   const BarcodeScanner({super.key});
 
   @override
-  State<BarcodeScanner> createState() => _BarcodeScannerState();
-}
-
-class _BarcodeScannerState extends State<BarcodeScanner>
-    with WidgetsBindingObserver {
-  final MobileScannerController controller = MobileScannerController(
-    torchEnabled: false,
-  );
-
-  StreamSubscription<BarcodeCapture>? _subscription;
-  Function(BarcodeCapture)? _handleBarcode;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    // Start listening to the barcode events.
-    _handleBarcode = (BarcodeCapture capture) {
-      Navigator.of(context).maybePop(capture);
-    };
-
-    _subscribe();
+  Widget build(BuildContext context) {
+    return UiBuilder<BarcodeBloc>((context, state) {
+      return Column(
+        children: [
+          _cameraSettingsContainer(context),
+          if (state is BarcodeSuccessState) _barcodeLabel(context, state),
+          if (state is FailureState) _barcodeLabel(context, state),
+          if (state is LoadingState) _cameraContainer(context),
+          _productInfo(context, state),
+        ],
+      );
+    });
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    switch (state) {
-      case AppLifecycleState.resumed:
-        _subscribe();
+  Widget _productInfo(BuildContext context, UiState state) {
+    final Widget child;
+    switch (state.runtimeType) {
+      case BarcodeSuccessState:
+        state as BarcodeSuccessState;
+        child = _nutritionFacts(context, state);
         break;
-      case AppLifecycleState.inactive:
-        _unsubscribe();
+      case FailureState:
+        state as FailureState;
+        child = _rescanButton(context);
         break;
       default:
+        child = const LoadingIndicator();
         break;
     }
+
+    return Expanded(child: child);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Barcode Scanner')),
-      backgroundColor: Colors.black,
-      body: Column(
-        children: [_cameraSettingsContainer(), _cameraContainer()],
-      ),
-    );
+  Widget _rescanButton(BuildContext context) {
+    return Center(
+        child: ElevatedButton(
+            child: const Text('Scan again'),
+            onPressed: () => context.read<BarcodeBloc>().startScanning()));
   }
 
-  Widget _cameraContainer() {
-    return SizedBox(
-      height: 200,
-      child: MobileScanner(
-        controller: controller,
-        fit: BoxFit.fitWidth,
-        errorBuilder: (context, error, child) {
-          return ScannerErrorWidget(error: error);
-        },
-        onDetect: (BarcodeCapture barcodes) {
-          print(barcodes.toString());
-          // Not needed since we listen to the barcode stream
-        },
-      ),
-    );
-  }
-
-  Widget _cameraSettingsContainer() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ToggleFlashlightButton(controller: controller),
-        ScannedBarcodeLabel(
-          barcodes: controller.barcodes,
-          title: 'Scan',
+  Widget _nutritionFacts(BuildContext context, BarcodeSuccessState state) {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Text(state.name),
+            Container(height: 10),
+            _nutrientTable(state),
+            Container(height: 10),
+            Text(state.source),
+            Expanded(child: _rescanButton(context))
+          ],
         ),
-        AnalyzeImageFromGalleryButton(controller: controller),
+      ),
+    );
+  }
+
+  Widget _nutrientTable(BarcodeSuccessState state) {
+    return Table(
+      children: [
+        _nutrientRow('Carbohydrate', state.carbs),
+        _nutrientRow('Fiber', state.fiber),
+        _nutrientRow('Protein', state.protein),
       ],
     );
   }
 
-  void _subscribe() {
-    _subscription = controller.barcodes.listen(_handleBarcode);
-    unawaited(controller.start());
+  TableRow _nutrientRow(String name, String value) {
+    return TableRow(
+      children: [Text(name), Text(value)],
+    );
   }
 
-  void _unsubscribe() {
-    unawaited(_subscription?.cancel());
-    _subscription = null;
-    controller.dispose();
+  Widget _barcodeLabel(BuildContext context, UiState state) {
+    String? code;
+    switch (state.runtimeType) {
+      case BarcodeSuccessState:
+        state as BarcodeSuccessState;
+        code = state.code;
+      case FailureState:
+        state as FailureState;
+        code = state.message;
+    }
+    return SizedBox(
+        height: 200,
+        child: Align(
+            alignment: Alignment.center,
+            child: code != null
+                ? Text(code)
+                : Text('Unable to scan barcode')
+
+        )
+    );
   }
 
-  @override
-  Future<void> dispose() async {
-    WidgetsBinding.instance.removeObserver(this);
-    _unsubscribe();
-    super.dispose();
+
+  Widget _cameraContainer(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: Container(
+        color: Colors.black,
+        child: MobileScanner(
+          controller: context.read<BarcodeBloc>().controller,
+          fit: BoxFit.fitWidth,
+          errorBuilder: (context, error, child) {
+            return ScannerErrorWidget(error: error);
+          },
+          onDetect: (BarcodeCapture barcodes) {
+            // Not needed since we listen to the barcode stream
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _cameraSettingsContainer(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Scan a barcode label.',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+      ],
+    );
   }
 }

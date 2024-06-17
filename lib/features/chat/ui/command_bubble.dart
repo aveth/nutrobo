@@ -18,7 +18,9 @@ class CommandBubble extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: ElevatedButton.icon(
             onPressed: () => onPressed(),
-            onLongPress: () => print(command.description),
+            onLongPress: () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(command.description))
+            ),
             icon: Icon(command.icon),
             label: Text(command.title)
         )

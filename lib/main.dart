@@ -1,7 +1,8 @@
-import 'package:alice/alice.dart';
+import 'package:chuck_interceptor/chuck.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/core/di.dart';
+import 'package:nutrobo/core/theme.dart';
 import 'package:nutrobo/features/auth/bloc/auth_bloc.dart';
 import 'package:nutrobo/features/auth/ui/auth_screen.dart';
 import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
@@ -24,17 +25,12 @@ class NutroboApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Diabetes Friend',
-      navigatorKey: getIt.get<Alice>().getNavigatorKey(),
+      navigatorKey: getIt.get<Chuck>().getNavigatorKey(),
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: nutroboTheme(),
       home: MultiBlocProvider(providers: [
         BlocProvider(
             create: (context) => getIt.get<ChatBloc>(),
-        ),
-        BlocProvider(
-            create: (context) => getIt.get<BarcodeBloc>(),
         ),
         BlocProvider(
             create: (context) => getIt.get<AuthBloc>()
@@ -47,6 +43,9 @@ class NutroboApp extends StatelessWidget {
         ),
         BlocProvider(
             create: (context) => getIt.get<MealsBloc>()
+        ),
+        BlocProvider(
+            create: (context) => getIt.get<BarcodeBloc>()
         )
       ], child: const AuthScreen()),
     );

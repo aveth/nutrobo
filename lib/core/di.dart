@@ -1,5 +1,5 @@
-import 'package:alice/alice.dart';
 import 'package:chopper/chopper.dart';
+import 'package:chuck_interceptor/chuck.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,6 +18,7 @@ import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
 import 'package:nutrobo/features/home/bloc/home_bloc.dart';
 import 'package:nutrobo/features/meals/bloc/meals_bloc.dart';
+import 'package:nutrobo/features/meals/model/food.dart';
 import 'package:nutrobo/features/profile/model/profile.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 import 'package:nutrobo/features/shared/service/storage_service.dart';
@@ -78,12 +79,13 @@ Future<void> _chopper() async {
     interceptors: [
       HttpLoggingInterceptor(),
       AuthInterceptor(auth: getIt.get<AuthService>()),
-      getIt.get<Alice>().getChopperInterceptor()
+      //getIt.get<Chuck>().ch
     ],
     errorConverter: const JsonConverter(),
     converter: ModelConverter({
       Thread: (json) => Thread.fromJson(json),
-      Profile: (json) => Profile.fromJson(json)
+      Profile: (json) => Profile.fromJson(json),
+      Food: (json) => Food.fromJson(json),
     }),
   );
 
@@ -94,9 +96,9 @@ void _services() {
   getIt.registerSingleton(AuthService(
       auth: FirebaseAuth.instance
   ));
-  getIt.registerSingleton(Alice(
+  getIt.registerSingleton(Chuck(
       showNotification: true,
-      showInspectorOnShake: true,
+      showInspectorOnShake: false,
       maxCallsCount: 1000,
   ));
   getIt.registerSingleton(StorageService(
@@ -106,29 +108,28 @@ void _services() {
 }
 
 void _viewModels() {
-  getIt.registerSingleton(ChatBloc(
+  getIt.registerFactory(() => ChatBloc(
       auth: getIt.get<AuthService>(),
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
 
-  getIt.registerSingleton(BarcodeBloc(
-      storage: getIt.get<FlutterSecureStorage>(),
+  getIt.registerFactory(() => BarcodeBloc(
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
 
-  getIt.registerSingleton(AuthBloc(
+  getIt.registerFactory(() => AuthBloc(
       auth: getIt.get<AuthService>()
   ));
 
-  getIt.registerSingleton(SettingsBloc(
+  getIt.registerFactory(() => SettingsBloc(
       storage: getIt.get<StorageService>(),
       environments: getIt.get<Environments>(),
       auth: getIt.get<AuthService>()
   ));
 
-  getIt.registerSingleton(HomeBloc());
+  getIt.registerFactory(() => HomeBloc());
 
-  getIt.registerSingleton(MealsBloc(
+  getIt.registerFactory(() => MealsBloc(
       api: getIt.get<ChopperClient>().getService<NutroboApi>()
   ));
 }
