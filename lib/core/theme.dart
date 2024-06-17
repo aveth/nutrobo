@@ -51,11 +51,11 @@ ThemeData nutroboTheme() {
       ),
       titleSmall: GoogleFonts.roboto(
         color: Colors.black,
-        fontSize: 12,
+        fontSize: 16,
       ),
       displayLarge: GoogleFonts.roboto(
         color: Colors.black,
-        fontSize: 72,
+        fontSize: 24,
       ),
       displayMedium: GoogleFonts.roboto(
         color: Colors.black,

@@ -62,7 +62,6 @@ class BarcodeScanner extends StatelessWidget {
             Container(height: 10),
             _nutrientTable(state),
             Container(height: 10),
-            Text(state.source),
             Expanded(child: _rescanButton(context))
           ],
         ),
@@ -76,6 +75,7 @@ class BarcodeScanner extends StatelessWidget {
         _nutrientRow('Carbohydrate', state.carbs),
         _nutrientRow('Fiber', state.fiber),
         _nutrientRow('Protein', state.protein),
+        _nutrientRow('Data source:', state.source),
       ],
     );
   }
@@ -96,16 +96,18 @@ class BarcodeScanner extends StatelessWidget {
         state as FailureState;
         code = state.message;
     }
-    return SizedBox(
+    final style = Theme.of(context).textTheme.displayLarge?.copyWith(
+      color: Colors.white
+    );
+    return Container(
+        color: Colors.black,
         height: 200,
         child: Align(
-            alignment: Alignment.center,
-            child: code != null
-                ? Text(code)
-                : Text('Unable to scan barcode')
-
-        )
-    );
+          alignment: Alignment.center,
+          child: code != null
+              ? Text(code, style: style)
+              : Text('Unable to scan barcode', style: style),
+        ));
   }
 
 

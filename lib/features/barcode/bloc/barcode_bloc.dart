@@ -36,8 +36,6 @@ class BarcodeBloc extends BaseBloc {
   StreamSubscription<BarcodeCapture>? _subscription;
   final controller = MobileScannerController();
 
-  bool _isStarted = false;
-
   BarcodeBloc({required this.api}) : super(LoadingState()) {
     on<InitEvent>((event, emit) {
       _start();
@@ -69,12 +67,13 @@ class BarcodeBloc extends BaseBloc {
   }
 
   void _start() {
+    controller.stop();
+
     _subscription ??= controller.barcodes.listen((BarcodeCapture capture) async {
       //final barcode = '0380003560011';
       final barcode = capture.barcodes.firstOrNull?.displayValue;
       if (barcode != null) {
         controller.stop();
-        _isStarted = false;
         final response = await api.getByBarcode(barcode);
         final food = response.body;
         if (response.isSuccessful && food != null) {
@@ -85,10 +84,7 @@ class BarcodeBloc extends BaseBloc {
       }
     });
 
-    if (!_isStarted) {
-      controller.start();
-      _isStarted = true;
-    }
+    controller.start();
   }
 
   @override
