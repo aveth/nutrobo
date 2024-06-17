@@ -51,6 +51,14 @@ class BarcodeScanner extends StatelessWidget {
             onPressed: () => context.read<BarcodeBloc>().startScanning()));
   }
 
+  Widget _continueButton(BuildContext context, BarcodeSuccessState state) {
+    return Center(
+        child: ElevatedButton(
+            child: const Text('Continue'),
+            onPressed: () => Navigator.pop(context, state.toString())
+        ));
+  }
+
   Widget _nutritionFacts(BuildContext context, BarcodeSuccessState state) {
     return Container(
       color: Colors.white,
@@ -62,6 +70,7 @@ class BarcodeScanner extends StatelessWidget {
             Container(height: 10),
             _nutrientTable(state),
             Container(height: 10),
+            Expanded(child: _continueButton(context, state)),
             Expanded(child: _rescanButton(context))
           ],
         ),

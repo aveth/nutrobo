@@ -81,19 +81,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       emit(_stateFromMessages(messages));
 
-      var threadId = "";//await storage.getThreadId() ?? "";
-      final response = await api.sendMessage(
-          threadId,
-          SendMessage(
-            content: event.message,
-            data: [
-              "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
-              'The user should be addressed as Avais'
-            ]
-        )
-      );
+      final threadId = (await api.getProfile()).body?.threads.firstOrNull;
+      if (threadId != null) {
+        final response = await api.sendMessage(
+            threadId,
+            SendMessage(
+                content: event.message,
+                data: [
+                  "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
+                  'The user should be addressed as Avais'
+                ]
+            )
+        );
 
-      emit(_stateFromResponse(response));
+        emit(_stateFromResponse(response));
+      }
     });
 
     on<BarcodeEvent>((event, emit) async {

@@ -10,14 +10,21 @@ import 'package:nutrobo/features/shared/bloc/states.dart';
 class BarcodeSuccessState extends SuccessState {
   final String code;
   final String name;
+  final String servingSize;
   final String carbs;
   final String protein;
   final String fiber;
   final String source;
 
+  @override
+  String toString() {
+    return '$name\n\nServing Size: $servingSize\n\nCarbohydrate: $carbs\nFiber: $fiber\nProtein:$protein';
+  }
+
   BarcodeSuccessState(
       {required this.code,
       required this.name,
+      required this.servingSize,
       required this.carbs,
       required this.protein,
       required this.fiber,
@@ -46,6 +53,7 @@ class BarcodeBloc extends BaseBloc {
         BarcodeSuccessState(
             code: event.food.barcode,
             name: '${event.food.brandName} ${event.food.foodName}',
+            servingSize: _nutrientText(event.food.servingSize),
             carbs: _nutrientText(event.food.nutrients.carbohydrate),
             protein: _nutrientText(event.food.nutrients.protein),
             fiber: _nutrientText(event.food.nutrients.fiber),
@@ -70,8 +78,7 @@ class BarcodeBloc extends BaseBloc {
   void _start() {
     controller.stop();
 
-    _subscription ??=
-        controller.barcodes.listen((BarcodeCapture capture) async {
+    _subscription ??= controller.barcodes.listen((capture) async {
       //final barcode = '0380003560011';
       final barcode = capture.barcodes.firstOrNull?.displayValue;
       if (barcode != null) {

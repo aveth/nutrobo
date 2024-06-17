@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/core/command.dart';
 import 'package:nutrobo/core/routes.dart';
+import 'package:nutrobo/features/chat/bloc/chat_bloc.dart';
 import 'package:nutrobo/features/chat/ui/chat_messages.dart';
 import 'package:nutrobo/features/chat/ui/command_bubble.dart';
 import 'package:nutrobo/features/chat/ui/input_field.dart';
@@ -31,7 +32,9 @@ class ChatScreen extends StatelessWidget {
             child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Wrap(spacing: 10, children: [
-                  _barcodeBubble(context),
+                  _barcodeBubble(context, (result) =>
+                      context.read<ChatBloc>().sendMessage(result)
+                  ),
                   _ocrBubble(context)
                 ]))),
         InputField(controller: _controller),
@@ -40,13 +43,14 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-CommandBubble _barcodeBubble(BuildContext context) =>
+CommandBubble _barcodeBubble(BuildContext context, void Function(String) callback) =>
     CommandBubble(
         command: Command.barcodeScanner(context),
         onPressed: () async {
           var result = await Routes.toBarcodeScanner(context);
-          if (result != null && result is BarcodeCapture) {
-         }
+          if (result != null && result is String) {
+            callback(result);
+          }
         });
 
 CommandBubble _ocrBubble(BuildContext context) =>
