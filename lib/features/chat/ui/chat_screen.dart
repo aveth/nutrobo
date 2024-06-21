@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nutrobo/core/command.dart';
@@ -20,35 +21,38 @@ class ChatScreen extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: GestureDetector(onTap: () {
-            _controller.focusNode.unfocus();
-          },
-          child: Align(
-              alignment: Alignment.topCenter,
-              child: ChatMessages(),
-        ))),
-        Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Wrap(spacing: 10, children: [
-                  _barcodeBubble(context, (result) =>
-                      context.read<ChatBloc>().sendMessage(result)
-                  ),
-                  _ocrBubble(context)
-                ]))),
+            child: GestureDetector(
+                onTap: () {
+                  _controller.focusNode.unfocus();
+                },
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ChatMessages(),
+                ))),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: SingleChildScrollView(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              scrollDirection: Axis.horizontal,
+              child: Wrap(spacing: 10, children: [
+                _barcodeBubble(context, (result) =>
+                    context.read<ChatBloc>().sendNutritionInfo(result.food)
+                ),
+                _ocrBubble(context),
+              ])),
+        ),
         InputField(controller: _controller),
       ],
     );
   }
 }
 
-CommandBubble _barcodeBubble(BuildContext context, void Function(String) callback) =>
+CommandBubble _barcodeBubble(BuildContext context, void Function(BarcodeScannerResult) callback) =>
     CommandBubble(
         command: Command.barcodeScanner(context),
         onPressed: () async {
           var result = await Routes.toBarcodeScanner(context);
-          if (result != null && result is String) {
+          if (result != null && result is BarcodeScannerResult) {
             callback(result);
           }
         });

@@ -61,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
       children: [
         const Text("Authentication Token: "),
         _settingsValue(ElevatedButton(
-          child: const Text('Tap to copy'),
+          child: const Icon(Icons.copy),
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: state.authToken));
           }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:nutrobo/core/routes.dart';
 import 'package:nutrobo/features/barcode/bloc/barcode_bloc.dart';
 import 'package:nutrobo/features/barcode/ui/scanner_error_widget.dart';
 import 'package:nutrobo/features/shared/bloc/states.dart';
@@ -34,7 +35,7 @@ class BarcodeScanner extends StatelessWidget {
         break;
       case FailureState:
         state as FailureState;
-        child = _rescanButton(context);
+        child = _notFound(context, state);
         break;
       default:
         child = const LoadingIndicator();
@@ -54,9 +55,14 @@ class BarcodeScanner extends StatelessWidget {
   Widget _continueButton(BuildContext context, BarcodeSuccessState state) {
     return Center(
         child: ElevatedButton(
-            child: const Text('Continue'),
-            onPressed: () => Navigator.pop(context, state.toString())
-        ));
+      child: const Text('Continue'),
+      onPressed: () => Navigator.pop(
+          context,
+          BarcodeScannerResult(
+            message: state.toString(),
+            food: state.rawFood,
+          )),
+    ));
   }
 
   Widget _nutritionFacts(BuildContext context, BarcodeSuccessState state) {
@@ -72,6 +78,22 @@ class BarcodeScanner extends StatelessWidget {
             Container(height: 10),
             Expanded(child: _continueButton(context, state)),
             Expanded(child: _rescanButton(context))
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _notFound(BuildContext context, FailureState state) {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const Text('Unable to find nutrition data for this barcode.'),
+            Container(height: 10),
+            Expanded(child: _rescanButton(context)),
           ],
         ),
       ),
@@ -105,9 +127,8 @@ class BarcodeScanner extends StatelessWidget {
         state as FailureState;
         code = state.message;
     }
-    final style = Theme.of(context).textTheme.displayLarge?.copyWith(
-      color: Colors.white
-    );
+    final style =
+        Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white);
     return Container(
         color: Colors.black,
         height: 200,
@@ -118,7 +139,6 @@ class BarcodeScanner extends StatelessWidget {
               : Text('Unable to scan barcode', style: style),
         ));
   }
-
 
   Widget _cameraContainer(BuildContext context) {
     return SizedBox(

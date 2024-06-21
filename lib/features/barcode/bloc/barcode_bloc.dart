@@ -15,20 +15,23 @@ class BarcodeSuccessState extends SuccessState {
   final String protein;
   final String fiber;
   final String source;
+  final Food rawFood;
 
   @override
   String toString() {
-    return '$name\n\nServing Size: $servingSize\n\nCarbohydrate: $carbs\nFiber: $fiber\nProtein:$protein';
+    return '$name\n\nServing Size: $servingSize\n\nCarbohydrate: $carbs\nFiber: $fiber\nProtein: $protein';
   }
 
-  BarcodeSuccessState(
-      {required this.code,
-      required this.name,
-      required this.servingSize,
-      required this.carbs,
-      required this.protein,
-      required this.fiber,
-      required this.source});
+  BarcodeSuccessState({
+    required this.code,
+    required this.name,
+    required this.servingSize,
+    required this.carbs,
+    required this.protein,
+    required this.fiber,
+    required this.source,
+    required this.rawFood,
+  });
 }
 
 class _BarcodeFoundEvent extends UpdateEvent {
@@ -51,13 +54,15 @@ class BarcodeBloc extends BaseBloc {
     on<_BarcodeFoundEvent>((event, emit) {
       emit(
         BarcodeSuccessState(
-            code: event.food.barcode,
-            name: '${event.food.brandName} ${event.food.foodName}',
-            servingSize: _nutrientText(event.food.servingSize),
-            carbs: _nutrientText(event.food.nutrients.carbohydrate),
-            protein: _nutrientText(event.food.nutrients.protein),
-            fiber: _nutrientText(event.food.nutrients.fiber),
-            source: event.food.source),
+          code: event.food.barcode,
+          name: '${event.food.brandName} ${event.food.foodName}',
+          servingSize: _nutrientText(event.food.servingSize),
+          carbs: _nutrientText(event.food.nutrients.carbohydrate),
+          protein: _nutrientText(event.food.nutrients.protein),
+          fiber: _nutrientText(event.food.nutrients.fiber),
+          source: event.food.source,
+          rawFood: event.food,
+        ),
       );
     });
 

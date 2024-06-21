@@ -4,7 +4,7 @@ import 'package:chopper/chopper.dart';
 import 'package:nutrobo/features/chat/model/send_message.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/meals/model/food.dart';
-import 'package:nutrobo/features/profile/model/profile.dart';
+import 'package:nutrobo/features/profile/model/nutrobo_user.dart';
 
 part 'nutrobo_api.chopper.dart';
 
@@ -14,7 +14,7 @@ abstract class NutroboApi extends ChopperService {
   static NutroboApi create([ChopperClient? client]) => _$NutroboApi(client);
 
   @Get(path: 'user/get-profile')
-  Future<Response<Profile>> getProfile();
+  Future<Response<NutroboUser>> getProfile();
 
   @Post(path: 'assistant/send-message/{threadId}')
   Future<Response<Thread>> sendMessage(@path String threadId, @body SendMessage message);
@@ -23,7 +23,7 @@ abstract class NutroboApi extends ChopperService {
   Future<Response<Thread>> sendBarcode(@path String threadId, @body SendMessage message);
 
   @Post(path: 'assistant/send-nutrition-info/{threadId}')
-  Future<Response<Thread>> sendNutritionInfo(@path String threadId, @body SendMessage message);
+  Future<Response<Thread>> sendNutritionInfo(@path String threadId, @body Food food);
 
   @Post(path: 'assistant/create-thread', optionalBody: true)
   Future<Response<Thread>> createThread();

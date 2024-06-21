@@ -5,29 +5,37 @@ import 'package:nutrobo/features/chat/model/chat_message.dart';
 import 'package:nutrobo/features/chat/model/send_message.dart';
 import 'package:nutrobo/features/chat/model/thread.dart';
 import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
+import 'package:nutrobo/features/meals/model/food.dart';
 
-abstract class ChatEvent { }
-abstract class ChatState { }
+abstract class ChatEvent {}
 
-class InitialEvent extends ChatEvent { }
+abstract class ChatState {}
+
+class InitialEvent extends ChatEvent {}
+
 class SendEvent extends ChatEvent {
   final String message;
+
   SendEvent({required this.message});
 }
+
 class BarcodeEvent extends ChatEvent {
   final String barcode;
+
   BarcodeEvent({required this.barcode});
 }
 
 class NutritionInfoEvent extends ChatEvent {
-  final String info;
-  NutritionInfoEvent({required this.info});
+  final Food food;
+
+  NutritionInfoEvent({required this.food});
 }
 
-class InitialState extends ChatState { }
+class InitialState extends ChatState {}
 
 class SuccessState extends ChatState {
   final List<ChatMessage> messages;
+
   SuccessState({required this.messages});
 }
 
@@ -36,7 +44,6 @@ class LoadingState extends SuccessState {
 }
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-
   final AuthService auth;
   final NutroboApi api;
 
@@ -44,11 +51,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   List<ChatMessage> _currentMessages = [];
 
-  ChatBloc({
-    required this.auth,
-    required this.api
-  }) : super(InitialState()) {
-
+  ChatBloc({required this.auth, required this.api}) : super(InitialState()) {
     on<InitialEvent>((event, emit) async {
       var threadId = (await api.getProfile()).body?.threads.firstOrNull;
       Response<Thread> response;
@@ -67,58 +70,43 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<SendEvent>((event, emit) async {
       var messages = _currentMessages;
-      messages.insert(0, ChatMessage(
-          message: event.message,
-          time: DateTime.now(),
-          type: ChatMessageType.sent
-      ));
+      messages.insert(
+          0,
+          ChatMessage(
+              message: event.message,
+              time: DateTime.now(),
+              type: ChatMessageType.sent));
 
-      messages.insert(0, ChatMessage(
-          message: _loadingValue,
-          time: DateTime.now(),
-          type: ChatMessageType.received
-      ));
+      messages.insert(
+          0,
+          ChatMessage(
+              message: _loadingValue,
+              time: DateTime.now(),
+              type: ChatMessageType.received));
 
       emit(_stateFromMessages(messages));
 
       final threadId = (await api.getProfile()).body?.threads.firstOrNull;
-      if (threadId != null) {
-        final response = await api.sendMessage(
-            threadId,
-            SendMessage(
-                content: event.message,
-                data: [
-                  "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
-                  'The user should be addressed as Avais'
-                ]
-            )
-        );
+      if (threadId == null) return;
 
-        emit(_stateFromResponse(response));
-      }
-    });
-
-    on<BarcodeEvent>((event, emit) async {
-      var threadId = "";//await storage.getThreadId() ?? "";
-
-      _addTempMessage(emit, "Finding product for barcode: ${event.barcode}...");
-
-      final response = await api.sendBarcode(
+      final response = await api.sendMessage(
           threadId,
-          _getMessage(event.barcode)
-      );
+          SendMessage(content: event.message, data: [
+            "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
+            'The user should be addressed as Avais'
+          ]));
 
       emit(_stateFromResponse(response));
+
     });
 
     on<NutritionInfoEvent>((event, emit) async {
-      var threadId = "";//await storage.getThreadId() ?? "";
-
-      _addTempMessage(emit, "Analyzing nutrition info: ${event.info}...");
+      final threadId = (await api.getProfile()).body?.threads.firstOrNull;
+      if (threadId == null) return;
 
       final response = await api.sendNutritionInfo(
-          threadId,
-          _getMessage(event.info)
+        threadId,
+        event.food,
       );
 
       emit(_stateFromResponse(response));
@@ -135,38 +123,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     add(BarcodeEvent(barcode: barcode));
   }
 
-  void sendNutritionInfo(String info) {
-    add(NutritionInfoEvent(info: info));
-  }
-
-  SendMessage _getMessage(String content) {
-    return SendMessage(
-        content: content,
-        data: [
-          "You can calculate the user's insulin dose by using the insulin-to-carbohydrate ratio of 1:10",
-          'The user should be addressed as Avais'
-        ]
-    );
-  }
-
-  void _addTempMessage(emit, String content) {
-    var messages = _currentMessages;
-    messages.insert(0, ChatMessage(
-        message: content,
-        type: ChatMessageType.received,
-        time: DateTime.now()
-    ));
-
-    emit(_stateFromMessages(messages));
+  void sendNutritionInfo(Food food) {
+    add(NutritionInfoEvent(food: food));
   }
 
   ChatState _stateFromResponse(Response<Thread>? response) {
     if (response != null && response.isSuccessful) {
       var messages = response.body?.messages;
       if (messages != null) {
-        _currentMessages = messages.map((m) =>
-            ChatMessage.fromMessage(m)
-        ).toList();
+        _currentMessages =
+            messages.map((m) => ChatMessage.fromMessage(m)).toList();
       }
     }
 
@@ -180,6 +146,4 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       return SuccessState(messages: messages);
     }
   }
-
-
 }

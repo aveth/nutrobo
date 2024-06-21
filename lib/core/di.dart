@@ -19,7 +19,7 @@ import 'package:nutrobo/features/chat/service/nutrobo_api.dart';
 import 'package:nutrobo/features/home/bloc/home_bloc.dart';
 import 'package:nutrobo/features/meals/bloc/meals_bloc.dart';
 import 'package:nutrobo/features/meals/model/food.dart';
-import 'package:nutrobo/features/profile/model/profile.dart';
+import 'package:nutrobo/features/profile/model/nutrobo_user.dart';
 import 'package:nutrobo/features/settings/bloc/settings_bloc.dart';
 import 'package:nutrobo/features/shared/service/storage_service.dart';
 import 'package:nutrobo/firebase_options.dart';
@@ -79,12 +79,12 @@ Future<void> _chopper() async {
     interceptors: [
       HttpLoggingInterceptor(),
       AuthInterceptor(auth: getIt.get<AuthService>()),
-      //getIt.get<Chuck>().ch
+      //getIt.get<Chuck>().addHttpCall(ChuckHttpCall(id))
     ],
     errorConverter: const JsonConverter(),
     converter: ModelConverter({
       Thread: (json) => Thread.fromJson(json),
-      Profile: (json) => Profile.fromJson(json),
+      NutroboUser: (json) => NutroboUser.fromJson(json),
       Food: (json) => Food.fromJson(json),
     }),
   );
